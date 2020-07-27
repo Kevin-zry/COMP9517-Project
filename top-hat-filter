@@ -1,0 +1,58 @@
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy
+import pandas as pd
+import cv2
+import seaborn as sns
+import imutils
+import glob
+"""
+    implementation of top-hat filtering from lab5 paper
+    this thresholding is only useful for Fluo-N2DL-HeLa sequence
+"""
+# path of the folder
+path_to_folder = glob.glob('COMP9517 20T2 Group Project Image Sequences\Fluo-N2DL-HeLa/*.tif')
+# append all images into one list
+img_list = []
+for i in path_to_folder:
+    img_temp = cv2.imread(i, 0)
+    img_list.append(img_temp)
+
+# test the first image
+img = img_list[0]
+height, width = img.shape
+size = (height, width)
+
+# invert the original image
+img_inverted = cv2.bitwise_not(img)
+kernel = np.ones((2, 2), np.uint8)
+# morph opening operation
+img_opening = cv2.morphologyEx(img_inverted, cv2.MORPH_OPEN, kernel)
+
+img_s = img_inverted - img_opening
+# img_s = cv2.subtract(img_inverted, img_tophat)
+
+# adaptive thresh-holding
+ret, thresh = cv2.threshold(img_s, 165, 255, 3)
+
+# cv2.imshow("original", img)
+cv2.imshow("original", img)
+cv2.imshow("opening", img_opening)
+cv2.imshow("output", img_s)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# the output video method has a lot of bugs among updates of versions of CV
+"""
+# output sequence of images as a video
+fourcc = cv2.VideoWriter_fourcc('m', 'p', '4', 'v')
+# fourcc = cv2.VideoWriter_fourcc('F', 'M', 'P', '4')
+# fourcc and -1
+out = cv2.VideoWriter('project.avi', fourcc, 24.0, size)
+
+for i in range(len(img_list)):
+    out.write(img_list[i])
+out.release()
+"""
+
+
