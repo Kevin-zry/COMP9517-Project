@@ -1,10 +1,5 @@
-import cv2
-import numpy as np
-import matplotlib.pyplot as plt
-
 from tensorflow import keras
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from sklearn.model_selection import train_test_split
 
 from data import get_train_val
 from unet import build_unet
@@ -22,10 +17,11 @@ X_train, X_val, Y_train, Y_val = get_train_val(data='seg', reference='GT', split
 def get_data_generator(X, Y, batch_size=8, seed=5):
 	'''produce generator with data augmentation on the fly'''
 	datagen_args = dict(rotation_range=360,
-		                    zoom_range=0.4,
-		                    horizontal_flip=True,
-		                    vertical_flip=True,
-		                    fill_mode='reflect')
+		            zoom_range=0.4,
+		            horizontal_flip=True,
+		            vertical_flip=True,
+		            fill_mode='reflect')
+	
 	image_datagen = ImageDataGenerator(**datagen_args)
 	label_datagen = ImageDataGenerator(**datagen_args)
 
@@ -53,7 +49,7 @@ model.summary()
 model.compile(optimizer='adam',
               loss='binary_crossentropy', metrics='binary_accuracy')
 
-# Train the model (optial callbacks)
+# Train the model (optional callbacks)
 log_csv = keras.callbacks.CSVLogger('toy4_logs_with_aug.csv', separator=',')
 
 # Fit the model with original data
