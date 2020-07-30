@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 from skimage import io
 from sklearn.model_selection import train_test_split
 
-# define some setting parameters
-img_shape = (512, 512, 1)   # both m, n divisible by 16
+# DIC meta-data information
+img_shape = (512, 512, 1)   # both width and height should be divisible by 16
 IMG_HEIGHT, IMG_WIDTH, IMG_CHANNELS = img_shape
 non_digit = 'abcdefghijklmnopqrstuvwxyz./_'
 
