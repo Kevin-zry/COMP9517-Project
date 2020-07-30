@@ -61,7 +61,7 @@ train_generator = get_data_generator(X_train, Y_train, batch_size=8, seed=1)
 val_generator = get_data_generator(X_val, Y_val, batch_size=8, seed=2)
 
 # validation_data = val_generator or (X_val, Y_val)
-history = model.fit(train_generator, epochs=10, steps_per_epoch=20, shuffle=True,
+history = model.fit(train_generator, epochs=20, steps_per_epoch=200, shuffle=True,
 					callbacks=[log_csv], validation_data=val_generator)
 
 # Save the model
