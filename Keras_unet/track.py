@@ -51,11 +51,6 @@ track_ref = np.asarray([img for img in track_01] + [img for img in track_02])
 track_data = np.asarray(
     [cv2.equalizeHist(img) / 255 - 0.5 for img in track_data])
 
-# for sample in test_01[10:20]:
-#     plt.imshow(sample, 'gray')
-#     plt.show()
-# print(track_data.shape)
-
 # ------------------------ #
 # Step 3: Reference Output #
 # ------------------------ #
