@@ -39,15 +39,10 @@ def get_seg_data(reference):
         seg_02 = io.ImageCollection(_seg_02_GT + '/man_seg*.tif')
         seg1_idx = [int(f.replace(_seg_01_GT, '').strip(non_digit)) for f in seg_01.files]
         seg2_idx = [int(f.replace(_seg_02_GT, '').strip(non_digit)) for f in seg_02.files]
-        # print('seg_01 GT:', seg_01_idx)
-        # print('seg_02 GT:', seg_02_idx)
 
         X_train = np.asarray([train_01[i] for i in seg1_idx] + [train_02[i] for i in seg2_idx])
         Y_train = np.asarray(list(seg_01) + list(seg_02))
-        # Z_train = np.asarray([e for e in train_01] + [e for e in train_02])
-        # Y_train = np.asarray([seg_01[i] for i in range(9)] + [seg_02[i] for i in range(9)])
-        # print('X_train shape:', X_train.shape)
-        # print('Y_train shape:', Y_train.shape)
+
     if reference == 'ST':
         seg_01 = io.ImageCollection(_seg_01_ST + '/man_seg*.tif')
         seg_02 = io.ImageCollection(_seg_02_ST + '/man_seg*.tif')
