@@ -8,37 +8,62 @@ import imutils
 import glob
 """
     implementation of top-hat filtering from lab5 paper
-    this thresholding is only useful for Fluo-N2DL-HeLa sequence
 """
 # path of the folder
 path_to_folder = glob.glob('COMP9517 20T2 Group Project Image Sequences\Fluo-N2DL-HeLa/*.tif')
+
+
+# same method from group members
+def subtract_img(img1, img2):
+    img_O = np.zeros_like(img1)
+    for r in range(img1.shape[0]):
+        for c in range(img1.shape[1]):
+            img_O[r, c] = img1[r, c].astype('int32') - img2[r, c].astype('int32')
+            # if img_O[r,c]<=0:
+            # img_O[r,c]+=255
+
+    min = np.min(img_O)
+    max = np.max(img_O)
+    for r in range(img_O.shape[0]):
+        for c in range(img_O.shape[1]):
+            img_O[r, c] = (img_O[r, c] - min) * (255 / (max - min))
+
+    img_O = img_O.astype(np.uint8)
+    return img_O
+
+
 # append all images into one list
 img_list = []
 for i in path_to_folder:
     img_temp = cv2.imread(i, 0)
     img_list.append(img_temp)
 
+
 # test the first image
 img = img_list[0]
 height, width = img.shape
 size = (height, width)
 
-# invert the original image
-img_inverted = cv2.bitwise_not(img)
-kernel = np.ones((2, 2), np.uint8)
-# morph opening operation
-img_opening = cv2.morphologyEx(img_inverted, cv2.MORPH_OPEN, kernel)
 
-img_s = img_inverted - img_opening
-# img_s = cv2.subtract(img_inverted, img_tophat)
+def top_hat(img):
+    # invert the original image
+    img_inverted = cv2.bitwise_not(img)
+    kernel = np.ones((2, 2), np.uint8)
+    # morph opening operation
+    # try to adjust  the size of kernel or iterations
+    img_opening = cv2.morphologyEx(img_inverted, cv2.MORPH_OPEN, kernel, iterations=50)
+    img_s = subtract_img(img_inverted, img_opening)
+    return img_s
 
+
+img_t = top_hat(img)
 # adaptive thresh-holding
-ret, thresh = cv2.threshold(img_s, 165, 255, 3)
+# ret, thresh = cv2.threshold(img_s, 165, 255, 3)
 
 # cv2.imshow("original", img)
-cv2.imshow("original", img)
-cv2.imshow("opening", img_opening)
-cv2.imshow("output", img_s)
+# cv2.imshow("original", img)
+# cv2.imshow("opening", img_opening)
+cv2.imshow("output", img_t)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
 
