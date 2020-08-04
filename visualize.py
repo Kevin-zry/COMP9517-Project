@@ -30,15 +30,10 @@ def show_video_compare(data_list, fsize=(512, 512)):
 
     cv2.destroyAllWindows()
 
-
+    
+# show_video(seq_1)
 # show_video_compare([seq1, seq2, ...])
 
-# if __name__ == '__main__':
 
-#     from data import get_seg_data
 
-#     fsize = (512, 512)
-#     file_name = 'DIC_seq_02.mp4'
-#     seq, label = get_seg_data('ST')
-#     seq_1, seq_2 = seq[:84], seq[84:]
-#     show_video(seq_1)
+
