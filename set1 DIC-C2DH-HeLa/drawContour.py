@@ -1,10 +1,13 @@
 import cv2
+import sys
 import numpy as np
 import matplotlib.pyplot as plt
+
 from scipy import ndimage as ndi
 from skimage.morphology import watershed
 from skimage.feature import peak_local_max
-from skimage import io
+
+import skimage.io as io
 import skimage.transform as trans
 
 def draw_contours(img,pre):
@@ -59,27 +62,40 @@ def draw_contours(img,pre):
       #cv2.putText(img, text, org, fontFace, fontScale, color[, thickness[, lineType[, bottomLeftOrigin]]]) → None
       draw = cv2.putText(tex, str(j), (x,y), 1, 3, (255, 0, 255), 3)
 
-  return draw, center
+  # draw_with_cellnum = cv2.putText(draw, "CellNum: "+str(len(center)), (int(img.shape[0])//50,int(img.shape[1]//17)), 1, 2, (255, 0, 255), 3)
+  return draw, bound
 
 
-'''
-# draw_contours example
-
-for i in range(1):
-  raw_img_path = "/content/drive/Colab/data/DIC-C2DH-HeLa/Sequence 1"
-  predict_path = "/content/drive/Colab/data/DIC-C2DH-HeLa/predict/try3_m1"
-  save_path = "/content/drive/Colab/predict/try3_s1"
+######################################################
+save_path = ""
+raw_data = np.load(save_path + "s1_raw.npy")
+pre_data = np.load(save_path + "s1_pre.npy")
 
 
-  num = str(1000+i) #num[1:]
-  img = cv2.imread(raw_img_path + '/t' + num[1:] + '.tif',-1)
-  pre = cv2.imread(predict_path + '/t' + num[1:] + '_marker.tif',-1)
+res = {}
+for i in range(10):
+  img = raw_data[i]
+  pre = pre_data[i]
 
-  draw, center = draw_contours(img,pre)
+  draw, boxs = draw_contours(img,pre)
   # cv2.imwrite(save_path + '/t' + num[1:] + '_predict.tif',draw)
+  res[i] = {}
+  res[i]['frame'] = i
+  res[i]['draw_img'] = draw
+  res[i]['cell_num'] = len(boxs)
+  res[i]['boxs'] = boxs
+  
+  box_centers = []
+  for j in range(len(boxs)):
+    x,y = int(boxs[j][0]), int(boxs[j][1])
+    w,h = int(boxs[j][2]), int(boxs[j][3])
+    box_centers.append((x+w//2,y+h//2))
+  
+  res[i]['centers'] = box_centers
 
   print("frame:",i)
-  print("centers:",center)
+  print(box_centers)
+  
   plt.figure(figsize=(15,8))
   plt.subplot(141)
   plt.imshow(img,'gray')
@@ -89,5 +105,3 @@ for i in range(1):
   plt.imshow(draw,'gray')
   # plt.savefig('/content/drive/Colab/predict/try3_s1_plot/t'+ num[1:] + '.jpg')
   plt.show()
-
-'''
