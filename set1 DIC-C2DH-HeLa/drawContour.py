@@ -10,7 +10,16 @@ from skimage.feature import peak_local_max
 import skimage.io as io
 import skimage.transform as trans
 
-def draw_contours(img,pre):
+def not_close_to_boundary(point, th=0):
+    low, high = th, 512 - th
+    # print('point:', point)
+    if point[0] < low or point[0] > high:
+        return False
+    if point[1] < low or point[1] > high:
+        return False
+    return True
+
+def draw_contours(img,pre,frame):
   pre_float = np.zeros((img.shape[0],img.shape[1]),float)
   for i in range(img.shape[0]):
     for j in range(img.shape[1]):
@@ -44,26 +53,37 @@ def draw_contours(img,pre):
 
   rec = out.copy()
 
-  ellipse_list = []
+  rect_list = []
+  rect_out_list = []
   for i in range(len(contours)):
     x,y = int(bound[i][0]), int(bound[i][1])
     w,h = int(bound[i][2]), int(bound[i][3])
-    cv2.rectangle(rec, (x,y), (x+w,y+h), (0, 0, 255), 2)
-    ellipse = cv2.fitEllipse(contours[i])
-    ellipse_list.append(ellipse)
-    cv2.ellipse(rec, ((x+w//2,y+h//2), (min(h,w),max(h,w)), ellipse[2]), (0, 0, 255), 2)
+    #cv2.rectangle(rec, (x,y), (x+w,y+h), (0, 0, 255), 2)
+    #ellipse = cv2.fitEllipse(contours[i])
+    #cv2.ellipse(rec, ((x+w//2,y+h//2), (min(h,w),max(h,w)), ellipse[2]), (0, 0, 255), 2)
+    rect = cv2.minAreaRect(contours[i])
+    rect_out = [frame, rect[0], rect[1], rect[2]]
+    
+    if not_close_to_boundary(rect[0]):
+      rect_list.append(rect)
+      rect_out_list.append(rect_out)
+      cv2.rectangle(rec, (int(rect[0][0]-w//2), int(rect[0][1]-h//2)), (x+w,y+h), (0, 0, 255), 2)
+      #b = cv2.boxPoints(rect)
+      #b = np.int0(b)
+      #cv2.drawContours(rec,[b],0,(0,0,255),2)
     
 
   tex = rec.copy()
-  for i,j in zip(contours,range(len(contours))):
-      M = cv2.moments(i)
-      x,y = int(center[j][0]), int(center[j][1])
-      w,h = int(bound[j][2]), int(bound[j][3])
+  for i,j in zip(contours,range(len(rect_list))):
+      #M = cv2.moments(i)
+      #x,y = int(center[j][0]), int(center[j][1])
+      #w,h = int(bound[j][2]), int(bound[j][3])
+      x,y = int(rect_list[j][0][0]),int(rect_list[j][0][1])
       #cv2.putText(img, text, org, fontFace, fontScale, color[, thickness[, lineType[, bottomLeftOrigin]]]) → None
       draw = cv2.putText(tex, str(j), (x,y), 1, 3, (255, 0, 255), 3)
 
-  # draw_with_cellnum = cv2.putText(draw, "CellNum: "+str(len(center)), (int(img.shape[0])//50,int(img.shape[1]//17)), 1, 2, (255, 0, 255), 3)
-  return draw, bound
+  # draw_with_cellnum = cv2.putText(draw, "CellNum: "+str(len(rect_list)), (int(img.shape[0])//50,int(img.shape[1]//17)), 1, 2, (255, 0, 255), 3)
+  return draw, bound, rect_list, rect_out_list
 
 
 ######################################################
@@ -72,29 +92,24 @@ raw_data = np.load(save_path + "s1_raw.npy")
 pre_data = np.load(save_path + "s1_pre.npy")
 
 
-res = {}
-for i in range(10):
+length = 84
+res = [None]*length
+for i in range(length):
   img = raw_data[i]
   pre = pre_data[i]
 
-  draw, boxs = draw_contours(img,pre)
+  draw, bound, center, fitrect= draw_contours(img,pre,i)
   # cv2.imwrite(save_path + '/t' + num[1:] + '_predict.tif',draw)
   res[i] = {}
-  res[i]['frame'] = i
+  # res[i]['frame'] = i
   res[i]['draw_img'] = draw
-  res[i]['cell_num'] = len(boxs)
-  res[i]['boxs'] = boxs
-  
-  box_centers = []
-  for j in range(len(boxs)):
-    x,y = int(boxs[j][0]), int(boxs[j][1])
-    w,h = int(boxs[j][2]), int(boxs[j][3])
-    box_centers.append((x+w//2,y+h//2))
-  
-  res[i]['centers'] = box_centers
+  res[i]['cell_num'] = len(center)
+  res[i]['fitRect'] = fitrect
+  res[i]['boxs'] = bound
 
   print("frame:",i)
-  print(box_centers)
+  print(len(center))
+  print(fitrect)
   
   plt.figure(figsize=(15,8))
   plt.subplot(141)
@@ -105,3 +120,8 @@ for i in range(10):
   plt.imshow(draw,'gray')
   # plt.savefig('/content/drive/Colab/predict/try3_s1_plot/t'+ num[1:] + '.jpg')
   plt.show()
+
+
+np.save(save_path + 's1_draw_res.npy', res)
+# draw_data = np.load(save_path + "s1_draw_res.npy")
+# draw_data_dict = np.load(save_path + 's1_draw_res.npy',allow_pickle=True).item() 
