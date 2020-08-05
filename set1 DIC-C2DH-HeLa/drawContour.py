@@ -123,5 +123,4 @@ for i in range(length):
 
 
 np.save(save_path + 's1_draw_res.npy', res)
-# draw_data = np.load(save_path + "s1_draw_res.npy")
 # draw_data_dict = np.load(save_path + 's1_draw_res.npy',allow_pickle=True).item() 
