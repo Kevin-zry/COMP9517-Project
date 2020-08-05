@@ -2,7 +2,12 @@ import cv2
 import numpy as np
 
 
-a = [1,2,3,4] # 只是举个例子，比如第一帧的时候（f=1）, 点击后可以print（a[1]）
+#a = [1,2,3,4] # 只是举个例子，比如第一帧的时候（f=1）, 点击后可以print（a[1]）
+save_path = "D:/jupyter/9517_porject/res/"
+final_draw = np.load(save_path + 's1_draw_res.npy',allow_pickle=True)
+final_output = np.load(save_path + 's1_draw_res.npy',allow_pickle=True)
+show_video(final_draw)
+
 
 def get_output(x,y,f):
     print("here to output")
@@ -85,9 +90,9 @@ def show_video_compare(data_list, fsize=(512, 512)):
 #     show_video(seq_1)
 
 save_path = "D:/jupyter/9517_porject/res/"
-pre_data = np.load(save_path + "s1_pre.npy")
+#pre_data = np.load(save_path + "s1_pre.npy")
 # 读取数据，是多张图片的一个合集，自行替换
 # 比如84张512*512的图片，shape就是84*512*512
 #print(pre_data[0])
 
-show_video(pre_data)
+#show_video(pre_data)
