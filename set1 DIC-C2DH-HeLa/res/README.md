@@ -11,6 +11,6 @@ It is a dictionary:
 {'frame': 0,  
  'draw_img': an image array,  
  'cell_num': number of cells,  
- 'box': box parameters of box boundary, (top_left_corner_x, y , width, height)  
- 'centers': a list of cell centers,  
+ 'fitRect': a list of [(center_x,center_y), (width, height), rotated angle],  
+ 'boxs': box parameters of box boundary, (top_left_corner_x, y , width, height)   
 }}  
