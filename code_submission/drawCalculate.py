@@ -18,7 +18,7 @@ def draw_and_calculate(path_data, final_draw):
 
 	ifColor = 0
 	cnum = len(final_draw[0].shape)
-	if cnum > 3: ifColor =1
+	if cnum >= 3: ifColor =1
 
 	def dist(a, b):
 	  return sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2)
